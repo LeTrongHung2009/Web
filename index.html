@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Hệ thống quản lý CLB Tin học" />
+  <title>CLB Manager · Demo (Static)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 relative">
+  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-[260px_1fr]">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-800/60 backdrop-blur transform -translate-x-full transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 lg:flex flex-col gap-6 border-r border-white/5">
+      <div class="p-5">
+        <a href="#" class="flex items-center gap-3 group">
+          <div class="h-10 w-10 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500"></div>
+          <h1 class="text-lg font-extrabold">COMPUTER SCIENCE</h1>
+        </a>
+      </div>
+      <nav class="px-3">
+        <ul class="space-y-1">
+          <li><button data-tab="home" class="tab-btn w-full px-3 py-2 rounded-xl hover:bg-white/5" aria-current="true">Trang chủ</button></li>
+          <li id="membersTab"><button data-tab="members" class="tab-btn w-full px-3 py-2 rounded-xl hover:bg-white/5">Thành viên</button></li>
+          <li><button data-tab="events" class="tab-btn w-full px-3 py-2 rounded-xl hover:bg-white/5">Sự kiện</button></li>
+          <li><button data-tab="rules" class="tab-btn w-full px-3 py-2 rounded-xl hover:bg-white/5">Điều lệ</button></li>
+          <li><button data-tab="collab" class="tab-btn w-full px-3 py-2 rounded-xl hover:bg-white/5">Cộng tác</button></li>
+          <li><button data-tab="docs" class="tab-btn w-full px-3 py-2 rounded-xl hover:bg-white/5">Tài liệu</button></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="relative">
+      <header class="sticky top-0 z-40 border-b border-white/5 bg-slate-800/40 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+          <button id="menuToggle" class="lg:hidden text-white focus:outline-none">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div class="flex-1"><h2 class="font-bold" id="pageTitle">Trang chủ</h2></div>
+          <div class="flex items-center gap-2" id="authButtons">
+            <button id="openLogin" class="px-4 py-2 rounded-xl bg-white/10">Đăng nhập</button>
+            <button id="openRegister" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 font-semibold">Đăng ký</button>
+          </div>
+          <div class="flex items-center gap-2" id="userPanel" class="hidden">
+            <span id="userName" class="font-semibold"></span>
+            <button id="logoutBtn" class="px-4 py-2 rounded-xl bg-red-500">Đăng xuất</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="max-w-7xl mx-auto p-6 space-y-6">
+        <!-- Trang chủ -->
+        <div id="tab-home">
+          <h3 class="text-xl font-semibold mb-2">Chào mừng đến với CLB</h3>
+          <p class="text-slate-300">Đây là hệ thống quản lý thành viên và sự kiện của CLB Tin học.</p>
+        </div>
+
+        <!-- Thành viên -->
+        <div id="tab-members" class="hidden">
+          <div id="membersContent" class="hidden">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+              <h3 class="text-xl font-semibold">Danh sách thành viên</h3>
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+                <input id="searchMember" type="text" placeholder="Tìm kiếm..." class="w-full sm:w-auto rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5">
+                <button id="addMemberBtn" class="hidden px-4 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white w-full sm:w-auto">Thêm thành viên</button>
+              </div>
+            </div>
+            <div class="overflow-x-auto rounded-2xl border border-white/5 bg-slate-800/40">
+              <table class="min-w-full divide-y divide-white/5">
+                <thead>
+                  <tr class="bg-slate-800/60">
+                    <th class="px-5 py-3 text-left">Tên</th>
+                    <th class="px-5 py-3 text-left">Lớp</th>
+                    <th class="px-5 py-3 text-left">Ban</th>
+                    <th class="px-5 py-3 text-left">Nhóm</th>
+                    <th class="px-5 py-3 text-left">Năm</th>
+                    <th id="memberActionsHeader" class="px-5 py-3 text-left hidden">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="memberBody" class="divide-y divide-white/5">
+                  <!-- Dữ liệu sẽ được render động -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="membersLoginPrompt" class="text-center text-slate-300">Vui lòng đăng nhập để xem danh sách thành viên.</div>
+        </div>
+
+        <!-- Sự kiện -->
+        <div id="tab-events" class="hidden">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+            <h3 class="text-xl font-semibold">Danh sách sự kiện</h3>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+              <input id="searchEvent" type="text" placeholder="Tìm kiếm..." class="w-full sm:w-auto rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5">
+              <button id="addEventBtn" class="hidden px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white w-full sm:w-auto">Thêm sự kiện</button>
+            </div>
+          </div>
+          <div class="overflow-x-auto rounded-2xl border border-white/5 bg-slate-800/40">
+            <table class="min-w-full divide-y divide-white/5">
+              <thead>
+                <tr class="bg-slate-800/60">
+                  <th class="px-5 py-3 text-left">Tên sự kiện</th>
+                  <th class="px-5 py-3 text-left">Ngày</th>
+                  <th class="px-5 py-3 text-left">Địa điểm</th>
+                  <th id="eventActionsHeader" class="px-5 py-3 text-left hidden">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="eventBody" class="divide-y divide-white/5">
+                <!-- Dữ liệu sẽ được render động -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Điều lệ -->
+        <div id="tab-rules" class="hidden">
+          <h3 class="text-xl font-semibold mb-2">Điều lệ CLB</h3>
+          <p class="text-slate-300">Đây là các quy định chung của CLB Tin học:</p>
+          <ul class="list-disc ml-6 space-y-2 text-slate-300">
+            <li>Thành viên phải tham gia ít nhất 80% các hoạt động.</li>
+            <li>Tuân thủ nội quy trường học và CLB.</li>
+            <li>Đóng góp ý tưởng và hỗ trợ tổ chức sự kiện.</li>
+          </ul>
+        </div>
+
+        <!-- Cộng tác -->
+        <div id="tab-collab" class="hidden">
+          <h3 class="text-xl font-semibold mb-2">Cộng tác với CLB</h3>
+          <p class="text-slate-300">Chúng tôi hoan nghênh các đối tác và cộng tác viên. Liên hệ qua email: contact@clbtinhoc.com</p>
+        </div>
+
+        <!-- Tài liệu -->
+        <div id="tab-docs" class="hidden">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+            <h3 class="text-xl font-semibold">Tài liệu CLB</h3>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+              <input id="searchDoc" type="text" placeholder="Tìm kiếm..." class="w-full sm:w-auto rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5">
+              <label id="uploadDocBtn" class="hidden px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white cursor-pointer w-full sm:w-auto">
+                Tải lên tài liệu
+                <input id="docFile" type="file" class="hidden">
+              </label>
+            </div>
+          </div>
+          <div class="overflow-x-auto rounded-2xl border border-white/5 bg-slate-800/40">
+            <table class="min-w-full divide-y divide-white/5">
+              <thead>
+                <tr class="bg-slate-800/60">
+                  <th class="px-5 py-3 text-left">Tên tài liệu</th>
+                  <th class="px-5 py-3 text-left">Ngày tải lên</th>
+                  <th class="px-5 py-3 text-left">Download</th>
+                  <th id="docActionsHeader" class="px-5 py-3 text-left hidden">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="docBody" class="divide-y divide-white/5">
+                <!-- Dữ liệu sẽ được render động -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 rounded-xl bg-green-600 text-white hidden transition-opacity duration-300"></div>
+
+  <!-- Add/Edit Member Modal -->
+  <dialog id="memberModal" class="backdrop:bg-black/60 rounded-2xl p-0 w-[min(92vw,520px)]">
+    <form method="dialog" class="rounded-2xl shadow-xl bg-slate-900 border border-white/10 overflow-hidden text-white">
+      <div class="px-5 py-4 bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-between">
+        <h3 id="memberModalTitle" class="font-semibold text-white">➕ Thêm thành viên</h3>
+        <button type="button" id="closeMemberModal" class="p-2 rounded-lg hover:bg-white/20 text-white">✕</button>
+      </div>
+      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="md:col-span-2 text-white">Tên
+          <input id="memName" type="text" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+        </label>
+        <label class="text-white">Lớp
+          <input id="memClass" type="text" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+        </label>
+        <label class="text-white">Ban
+          <select id="memBan" required 
+            class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+            <option value="">-- Chọn ban --</option>
+            <option value="Quản lý">Quản lý</option>
+            <option value="Chuyên môn">Chuyên môn</option>
+            <option value="Thực hiện">Thực hiện</option>
+            <option value="Truyền thông">Truyền thông</option>
+          </select>
+        </label>
+        <label class="text-white">Nhóm
+          <select id="memGroup" required 
+            class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+            <option value="">-- Chọn nhóm --</option>
+            <option value="Coding">Coding</option>
+            <option value="AI & Robotics">AI & Robotics</option>
+            <option value="An ninh mạng">An ninh mạng</option>
+            <option value="Lắp ráp máy tính">Lắp ráp máy tính</option>
+          </select>
+        </label>
+        <label class="text-white">Năm
+          <input id="memYear" type="date" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+        </label>
+        <input type="hidden" id="memIndex">
+      </div>
+      <div class="p-5 pt-0 flex items-center justify-end gap-2">
+        <button type="button" id="cancelMember" class="px-4 py-2 rounded-xl bg-slate-800 border border-white/10 text-white">Hủy</button>
+        <button type="submit" id="saveMember" class="px-4 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white">Lưu</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Add/Edit Event Modal -->
+  <dialog id="eventModal" class="backdrop:bg-black/60 rounded-2xl p-0 w-[min(92vw,520px)]">
+    <form method="dialog" class="rounded-2xl shadow-xl bg-slate-900 border border-white/10 overflow-hidden text-white">
+      <div class="px-5 py-4 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-between">
+        <h3 id="eventModalTitle" class="font-semibold text-white">📅 Thêm sự kiện</h3>
+        <button type="button" id="closeEventModal" class="p-2 rounded-lg hover:bg-white/20 text-white">✕</button>
+      </div>
+      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="md:col-span-2 text-white">Tên sự kiện
+          <input id="evTitle" type="text" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+        </label>
+        <label class="text-white">Ngày
+          <input id="evDate" type="date" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+        </label>
+        <label class="md:col-span-2 text-white">Địa điểm
+          <input id="evLocation" type="text" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+        </label>
+        <input type="hidden" id="evIndex">
+      </div>
+      <div class="p-5 pt-0 flex items-center justify-end gap-2">
+        <button type="button" id="cancelEvent" class="px-4 py-2 rounded-xl bg-slate-800 border border-white/10 text-white">Hủy</button>
+        <button type="submit" id="saveEvent" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">Lưu</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Login Modal -->
+  <dialog id="loginModal" class="backdrop:bg-black/60 rounded-2xl p-0 w-[min(92vw,420px)]">
+    <form method="dialog" class="rounded-2xl shadow-xl bg-slate-900 border border-white/10 overflow-hidden text-white">
+      <div class="px-5 py-4 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-between">
+        <h3 class="font-semibold text-white">Đăng nhập</h3>
+        <button type="button" id="closeLoginModal" class="p-2 rounded-lg hover:bg-white/20 text-white">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <label class="block text-sm font-medium text-white">Email
+          <input id="loginEmail" type="email" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-white" />
+        </label>
+        <label class="block text-sm font-medium text-white">Mật khẩu
+          <input id="loginPassword" type="password" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-500 text-white" />
+        </label>
+      </div>
+      <div class="p-5 pt-0 flex items-center justify-end gap-2">
+        <button type="button" id="cancelLogin" class="px-4 py-2 rounded-xl bg-slate-800 border border-white/10 hover:bg-slate-700 text-white">Hủy</button>
+        <button type="submit" id="loginSubmit" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">Đăng nhập</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Register Modal -->
+  <dialog id="registerModal" class="backdrop:bg-black/60 rounded-2xl p-0 w-[min(92vw,520px)]">
+    <form method="dialog" class="rounded-2xl shadow-xl bg-slate-900 border border-white/10 overflow-hidden text-white">
+      <div class="px-5 py-4 bg-gradient-to-r from-purple-500 to-blue-600 flex items-center justify-between">
+        <h3 class="font-semibold text-white">Đăng ký tài khoản</h3>
+        <button type="button" id="closeRegisterModal" class="p-2 rounded-lg hover:bg-white/20 text-white">✕</button>
+      </div>
+      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="md:col-span-2 text-white">Họ và tên
+          <input id="regName" type="text" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white" />
+        </label>
+        <label class="text-white">Email
+          <input id="regEmail" type="email" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white" />
+        </label>
+        <label class="text-white">Mật khẩu
+          <input id="regPass" type="password" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white" />
+        </label>
+        <label class="md:col-span-2 text-white">Ban tham gia
+          <select id="regBan" class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+            <option value="">-- Chọn ban --</option>
+            <option value="Quản lý">Quản lý</option>
+            <option value="Chuyên môn">Chuyên môn</option>
+            <option value="Thực hiện">Thực hiện</option>
+            <option value="Truyền thông">Truyền thông</option>
+          </select>
+        </label>
+        <label class="md:col-span-2 text-white">Nhóm tham gia
+          <select id="regGroup" class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 text-white">
+            <option value="">-- Chọn nhóm --</option>
+            <option value="Coding">Coding</option>
+            <option value="AI & Robotics">AI & Robotics</option>
+            <option value="An ninh mạng">An ninh mạng</option>
+            <option value="Lắp ráp máy tính">Lắp ráp máy tính</option>
+          </select>
+        </label>
+      </div>
+      <div class="p-5 pt-0 flex items-center justify-end gap-2">
+        <button type="button" id="cancelRegister" class="px-4 py-2 rounded-xl bg-slate-800 border border-white/10 text-white">Hủy</button>
+        <button type="submit" id="registerSubmit" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-blue-600 text-white">Đăng ký</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- OTP Verification Modal -->
+  <dialog id="otpModal" class="backdrop:bg-black/60 rounded-2xl p-0 w-[min(92vw,420px)]">
+    <form method="dialog" class="rounded-2xl shadow-xl bg-slate-900 border border-white/10 overflow-hidden text-white">
+      <div class="px-5 py-4 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-between">
+        <h3 class="font-semibold text-white">Xác thực OTP</h3>
+        <button type="button" id="closeOtpModal" class="p-2 rounded-lg hover:bg-white/20 text-white">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <p class="text-slate-300">Chúng tôi đã gửi mã OTP đến email của bạn. Mã có hiệu lực trong 5 phút. Vui lòng nhập mã để xác thực.</p>
+        <label class="block text-sm font-medium text-white">Mã OTP
+          <input id="otpCode" type="text" required class="mt-1 w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-white" />
+        </label>
+        <button type="button" id="resendOtp" class="text-blue-500 hover:underline">Gửi lại OTP</button>
+      </div>
+      <div class="p-5 pt-0 flex items-center justify-end gap-2">
+        <button type="button" id="cancelOtp" class="px-4 py-2 rounded-xl bg-slate-800 border border-white/10 hover:bg-slate-700 text-white">Hủy</button>
+        <button type="submit" id="verifyOtp" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">Xác thực</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 py-4 text-center text-slate-300">
+    © 2025 CLB Tin học | Liên hệ: contact@gmail.com
+  </footer>
+
+  <!-- Loading Spinner -->
+  <div id="loading" class="fixed inset-0 bg-black/50 items-center justify-center hidden">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
